@@ -132,11 +132,6 @@ impl Error {
         self.inner.url = Some(url);
         self
     }
-
-    #[allow(unused)]
-    pub(crate) fn into_io(self) -> io::Error {
-        io::Error::new(io::ErrorKind::Other, self)
-    }
 }
 
 impl fmt::Debug for Error {
@@ -194,6 +189,16 @@ impl fmt::Display for Error {
         }
 
         Ok(())
+    }
+}
+
+impl Into<io::Error> for Error {
+    fn into(self) -> io::Error {
+        if self.is_timeout() {
+            io::Error::new(io::ErrorKind::TimedOut, self)
+        } else {
+            io::Error::new(io::ErrorKind::Other, self)
+        }
     }
 }
 
@@ -266,11 +271,6 @@ if_wasm! {
 // io::Error helpers
 
 #[allow(unused)]
-pub(crate) fn into_io(e: Error) -> io::Error {
-    e.into_io()
-}
-
-#[allow(unused)]
 pub(crate) fn decode_io(e: io::Error) -> Error {
     if e.get_ref().map(|r| r.is::<Error>()).unwrap_or(false) {
         *e.into_inner()
@@ -323,7 +323,7 @@ mod tests {
     fn roundtrip_io_error() {
         let orig = super::request("orig");
         // Convert reqwest::Error into an io::Error...
-        let io = orig.into_io();
+        let io = orig.into();
         // Convert that io::Error back into a reqwest::Error...
         let err = super::decode_io(io);
         // It should have pulled out the original, not nested it...
