@@ -192,8 +192,10 @@ impl Part {
 
         // BUG: the return value of to_js_value() is not valid if
         // it is a Multipart variant.
+
+        //self.value is always Body::Bytes
         let js_value = self.value.to_js_value()?;
-        Blob::new_with_u8_array_sequence_and_options(&js_value, &properties)
+        Blob::new_with_buffer_source_sequence_and_options(&js_value, &properties)
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)
     }
