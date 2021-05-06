@@ -191,7 +191,7 @@ impl Part {
         }
 
         use web_sys::EndingTypes;
-        properties.endings(EndingType::Native);
+        properties.endings(EndingTypes::Native);
 
         // BUG: the return value of to_js_value() is not valid if
         // it is a Multipart variant.
