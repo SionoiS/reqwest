@@ -167,6 +167,7 @@ features = [
     "ReadableStream",
     "Blob",
     "BlobPropertyBag",
+    "EndingTypes",
     "ServiceWorkerGlobalScope",
     "RequestCredentials"
 ]

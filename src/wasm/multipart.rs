@@ -190,6 +190,9 @@ impl Part {
             properties.type_(mime.as_ref());
         }
 
+        use web_sys::EndingTypes;
+        properties.endings(EndingType::Native);
+
         // BUG: the return value of to_js_value() is not valid if
         // it is a Multipart variant.
 
