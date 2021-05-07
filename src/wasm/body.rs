@@ -19,8 +19,11 @@ pub struct Body {
 
 enum Inner {
     Bytes(Bytes),
+
     #[cfg(feature = "multipart")]
     Multipart(Form),
+
+    Text(String),
 }
 
 impl Body {
@@ -38,6 +41,10 @@ impl Body {
                 let js_value: &JsValue = form_data.as_ref();
                 Ok(js_value.to_owned())
             }
+            Inner::Text(string) => {
+                let js_value = JsValue::from(string);
+                Ok(js_value)
+            }
         }
     }
 
@@ -54,6 +61,7 @@ impl Body {
             Inner::Bytes(bytes) => bytes.is_empty(),
             #[cfg(feature = "multipart")]
             Inner::Multipart(form) => form.is_empty(),
+            Inner::Text(string) => string.is_empty(),
         }
     }
 }
@@ -89,7 +97,7 @@ impl From<String> for Body {
     #[inline]
     fn from(s: String) -> Body {
         Body {
-            inner: Inner::Bytes(s.into()),
+            inner: Inner::Text(s),
         }
     }
 }
@@ -97,7 +105,7 @@ impl From<String> for Body {
 impl From<&'static str> for Body {
     #[inline]
     fn from(s: &'static str) -> Body {
-        s.as_bytes().into()
+        s.to_owned().into()
     }
 }
 
