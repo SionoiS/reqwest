@@ -136,7 +136,7 @@ impl Request {
         let mut req = Request::new(self.method().clone(), self.url().clone());
         *req.timeout_mut() = self.timeout().cloned();
         *req.headers_mut() = self.headers().clone();
-        *req.version_mut() = self.version().clone();
+        *req.version_mut() = self.version();
         req.body = body;
         Some(req)
     }
@@ -565,7 +565,7 @@ where
             headers,
             body: Some(body.into()),
             timeout: None,
-            version: version,
+            version,
         })
     }
 }
@@ -642,6 +642,7 @@ mod tests {
         assert_eq!(req.url().query(), Some("foo=bar&qux=three"));
     }
 
+    #[allow(clippy::blacklisted_name)]
     #[test]
     fn test_replace_headers() {
         use http::HeaderMap;

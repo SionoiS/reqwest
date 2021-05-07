@@ -334,7 +334,7 @@ impl Stream for IoStream {
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<Self::Item>> {
         match futures_core::ready!(Pin::new(&mut self.0).poll_next(cx)) {
             Some(Ok(chunk)) => Poll::Ready(Some(Ok(chunk))),
-            Some(Err(err)) => Poll::Ready(Some(Err(err.into_io()))),
+            Some(Err(err)) => Poll::Ready(Some(Err(err.into()))),
             None => Poll::Ready(None),
         }
     }

@@ -1005,7 +1005,7 @@ mod verbose {
                 } else if c == b'\0' {
                     write!(f, "\\0")?;
                 // ASCII printable
-                } else if c >= 0x20 && c < 0x7f {
+                } else if (0x20..0x7f).contains(&c) {
                     write!(f, "{}", c as char)?;
                 } else {
                     write!(f, "\\x{:02x}", c)?;
@@ -1028,7 +1028,7 @@ mod tests {
     use tokio::net::TcpStream;
     use tokio::runtime;
 
-    static TUNNEL_UA: &'static str = "tunnel-test/x.y";
+    static TUNNEL_UA: &str = "tunnel-test/x.y";
     static TUNNEL_OK: &[u8] = b"\
         HTTP/1.1 200 OK\r\n\
         \r\n\
