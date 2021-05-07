@@ -189,10 +189,6 @@ impl Part {
         if let Some(mime) = &self.meta.mime {
             properties.type_(mime.as_ref());
         }
-
-        use web_sys::EndingTypes;
-        properties.endings(EndingTypes::Native);
-
         // BUG: the return value of to_js_value() is not valid if
         // it is a Multipart variant.
 
