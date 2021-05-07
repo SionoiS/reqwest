@@ -35,8 +35,9 @@ impl Body {
             #[cfg(feature = "multipart")]
             Inner::Multipart(form) => {
                 let form_data = form.to_form_data()?;
-                let js_value: &JsValue = form_data.as_ref();
-                Ok(js_value.to_owned())
+                //let js_value: &JsValue = form_data.as_ref();
+                //Ok(js_value.to_owned())
+                Ok(form_data.unchecked_into())
             }
         }
     }
