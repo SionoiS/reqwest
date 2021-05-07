@@ -200,10 +200,10 @@ impl RequestBuilder {
     #[cfg_attr(docsrs, doc(cfg(feature = "multipart")))]
     pub fn multipart(mut self, multipart: super::multipart::Form) -> RequestBuilder {
         if let Ok(ref mut req) = self.request {
-            req.headers_mut().insert(
+            /* req.headers_mut().insert(
                 CONTENT_TYPE,
                 HeaderValue::from_static("multipart/form-data"),
-            );
+            ); */
 
             *req.body_mut() = Some(Body::from_form(multipart))
         }
