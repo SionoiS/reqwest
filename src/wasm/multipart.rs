@@ -100,7 +100,7 @@ impl Form {
 
                 form.append_with_blob_and_filename(name, &blob, &file_name)
             } else {
-                let string = part.to_string();
+                let string = part.to_string()?;
 
                 form.append_with_str(name, &string)
             }
@@ -201,8 +201,10 @@ impl Part {
             .map_err(crate::error::builder)
     }
 
-    fn to_string(self) -> String {
-        self.value.into()
+    fn to_string(&self) -> crate::Result<String> {
+        let js_value = self.value.to_js_value()?;
+
+        Ok(js_value.as_string().unwrap())
     }
 }
 
