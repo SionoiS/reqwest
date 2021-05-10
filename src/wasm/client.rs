@@ -213,7 +213,10 @@ async fn fetch(req: Request) -> crate::Result<Response> {
 
     if let Some(body) = req.body() {
         if !body.is_empty() {
-            init.body(Some(&body.to_js_value()?));
+            #[cfg(feature = "multipart")]
+            {
+                init.body(Some(body.to_form_data()?.as_ref()));
+            }
         }
     }
 

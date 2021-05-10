@@ -4,11 +4,6 @@ use std::future::Future;
 use std::io::Write;
 use std::time::Duration;
 
-use base64::write::EncoderWriter as Base64Encoder;
-use serde::Serialize;
-#[cfg(feature = "json")]
-use serde_json;
-
 use super::body::Body;
 use super::client::{Client, Pending};
 #[cfg(feature = "multipart")]
@@ -18,7 +13,9 @@ use super::response::Response;
 use crate::header::CONTENT_LENGTH;
 use crate::header::{HeaderMap, HeaderName, HeaderValue, CONTENT_TYPE};
 use crate::{Method, Url};
+use base64::write::EncoderWriter as Base64Encoder;
 use http::{request::Parts, Request as HttpRequest, Version};
+use serde::Serialize;
 
 /// A request which can be executed with `Client::execute()`.
 pub struct Request {

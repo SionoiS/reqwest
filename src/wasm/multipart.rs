@@ -94,7 +94,7 @@ impl Form {
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)?;
 
-        for (name, part) in self.inner.fields.iter() {
+        /* for (name, part) in self.inner.fields.iter() {
             let blob = part.blob()?;
 
             if let Some(file_name) = &part.metadata().file_name {
@@ -104,7 +104,12 @@ impl Form {
             }
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)?;
+        } */
+
+        for (name, part) in self.inner.fields.iter() {
+            form.append_with_str("object data", &part.to_string());
         }
+
         Ok(form)
     }
 }
@@ -193,10 +198,15 @@ impl Part {
         // it is a Multipart variant.
 
         //self.value is always Body::Bytes
-        let js_value = self.value.to_js_value()?;
-        Blob::new_with_str_sequence_and_options(&js_value, &properties)
+        let js_value = self.value.to_buffer_view()?;
+        Blob::new_with_buffer_source_sequence_and_options(js_value.as_ref(), &properties)
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)
+    }
+
+    fn to_string(&self) -> String {
+        //TODO body -> string
+        self.value
     }
 }
 

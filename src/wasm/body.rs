@@ -6,6 +6,11 @@ use js_sys::Uint8Array;
 use std::fmt;
 use wasm_bindgen::JsValue;
 
+#[cfg(feature = "multipart")]
+use web_sys::FormData;
+
+use crate::error::{Error, Kind};
+
 /// The body of a `Request`.
 ///
 /// In most cases, this is not needed directly, as the
@@ -22,30 +27,27 @@ enum Inner {
 
     #[cfg(feature = "multipart")]
     Multipart(Form),
-
-    Text(String),
 }
 
 impl Body {
-    pub(crate) fn to_js_value(&self) -> crate::Result<JsValue> {
-        match &self.inner {
-            Inner::Bytes(body_bytes) => {
-                let body_bytes: &[u8] = body_bytes.as_ref();
-                let body_array: Uint8Array = body_bytes.into();
-                let js_value: &JsValue = body_array.as_ref();
-                Ok(js_value.to_owned())
-            }
-            #[cfg(feature = "multipart")]
-            Inner::Multipart(form) => {
-                let form_data = form.to_form_data()?;
-                let js_value: &JsValue = form_data.as_ref();
-                Ok(js_value.to_owned())
-            }
-            Inner::Text(string) => {
-                let js_value = JsValue::from(string);
-                Ok(js_value)
-            }
+    pub(crate) fn to_buffer_view(&self) -> crate::Result<Uint8Array> {
+        if let Inner::Bytes(body_bytes) = &self.inner {
+            let body_bytes: &[u8] = body_bytes.as_ref();
+            let body_array: Uint8Array = body_bytes.into();
+
+            return Ok(body_array);
         }
+
+        Err(Error::new(Kind::Body, None::<Error>))
+    }
+
+    #[cfg(feature = "multipart")]
+    pub(crate) fn to_form_data(&self) -> crate::Result<FormData> {
+        if let Inner::Multipart(form) = &self.inner {
+            return form.to_form_data();
+        }
+
+        Err(Error::new(Kind::Body, None::<Error>))
     }
 
     #[inline]
@@ -61,7 +63,6 @@ impl Body {
             Inner::Bytes(bytes) => bytes.is_empty(),
             #[cfg(feature = "multipart")]
             Inner::Multipart(form) => form.is_empty(),
-            Inner::Text(string) => string.is_empty(),
         }
     }
 }
@@ -97,7 +98,7 @@ impl From<String> for Body {
     #[inline]
     fn from(s: String) -> Body {
         Body {
-            inner: Inner::Text(s),
+            inner: Inner::Bytes(s.into()),
         }
     }
 }

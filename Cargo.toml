@@ -26,7 +26,7 @@ features = [
 ]
 
 [features]
-default = ["default-tls"]
+default = ["multipart", "json", "stream"]
 
 # Note: this doesn't enable the 'native-tls' feature, which adds specific
 # functionality for it.
