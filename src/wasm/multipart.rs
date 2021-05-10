@@ -94,20 +94,18 @@ impl Form {
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)?;
 
-        /* for (name, part) in self.inner.fields.iter() {
-            let blob = part.blob()?;
-
+        for (name, part) in self.inner.fields.iter() {
             if let Some(file_name) = &part.metadata().file_name {
+                let blob = part.blob()?;
+
                 form.append_with_blob_and_filename(name, &blob, &file_name)
             } else {
-                form.append_with_blob(name, &blob)
+                let string = part.to_string();
+
+                form.append_with_str(name, &string)
             }
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)?;
-        } */
-
-        for (name, part) in self.inner.fields.iter() {
-            form.append_with_str("object data", &part.to_string());
         }
 
         Ok(form)
@@ -197,15 +195,13 @@ impl Part {
         // BUG: the return value of to_js_value() is not valid if
         // it is a Multipart variant.
 
-        //self.value is always Body::Bytes
-        let js_value = self.value.to_buffer_view()?;
-        Blob::new_with_buffer_source_sequence_and_options(js_value.as_ref(), &properties)
+        let js_value = self.value.to_js_value()?;
+        Blob::new_with_u8_array_sequence_and_options(js_value.as_ref(), &properties)
             .map_err(crate::error::wasm)
             .map_err(crate::error::builder)
     }
 
-    fn to_string(&self) -> String {
-        //TODO body -> string
+    fn to_string(self) -> String {
         self.value
     }
 }
