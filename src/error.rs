@@ -192,12 +192,12 @@ impl fmt::Display for Error {
     }
 }
 
-impl Into<io::Error> for Error {
-    fn into(self) -> io::Error {
-        if self.is_timeout() {
-            io::Error::new(io::ErrorKind::TimedOut, self)
+impl From<crate::error::Error> for io::Error {
+    fn from(err: Error) -> io::Error {
+        if err.is_timeout() {
+            io::Error::new(io::ErrorKind::TimedOut, err)
         } else {
-            io::Error::new(io::ErrorKind::Other, self)
+            io::Error::new(io::ErrorKind::Other, err)
         }
     }
 }

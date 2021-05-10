@@ -202,7 +202,7 @@ impl Part {
     }
 
     fn to_string(self) -> String {
-        self.value
+        self.value.into()
     }
 }
 
